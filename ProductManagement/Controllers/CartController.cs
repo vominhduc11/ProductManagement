@@ -1,4 +1,4 @@
-﻿// Controllers/CartController.cs - Cập nhật với yêu cầu đăng nhập
+﻿// Controllers/CartController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Data;
@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ProductManagement.Controllers
 {
-    // Thêm Authorize cho tất cả các action trong controller
     [Authorize]
     public class CartController : Controller
     {
@@ -29,8 +28,30 @@ namespace ProductManagement.Controllers
             _logger = logger;
         }
 
+        // Kiểm tra xem người dùng có phải là Admin không
+        private bool IsAdminUser()
+        {
+            return User.IsInRole("Admin");
+        }
+
+        // Action filter để kiểm tra quyền trước mỗi action
+        private IActionResult CheckUserRole()
+        {
+            if (IsAdminUser())
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
+            return null;
+        }
+
         public IActionResult Index()
         {
+            // Kiểm tra nếu là Admin thì chuyển hướng
+            var checkResult = CheckUserRole();
+            if (checkResult != null)
+                return checkResult;
+
             var cart = _cartService.GetCart();
             return View(cart);
         }
@@ -40,6 +61,18 @@ namespace ProductManagement.Controllers
         {
             try
             {
+                // Kiểm tra nếu là Admin thì từ chối
+                if (IsAdminUser())
+                {
+                    if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    {
+                        return Json(new { success = false, message = "Tài khoản Admin không thể mua hàng" });
+                    }
+
+                    TempData["ErrorMessage"] = "Tài khoản Admin không thể mua hàng";
+                    return RedirectToAction("Index", "Admin");
+                }
+
                 var product = await _context.Products.FindAsync(productId);
                 if (product == null)
                 {
@@ -74,6 +107,17 @@ namespace ProductManagement.Controllers
         [HttpPost]
         public IActionResult RemoveFromCart(int productId)
         {
+            // Kiểm tra nếu là Admin thì từ chối
+            if (IsAdminUser())
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Tài khoản Admin không thể thực hiện chức năng này" });
+                }
+
+                return RedirectToAction("Index", "Admin");
+            }
+
             _cartService.RemoveFromCart(productId);
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -88,6 +132,17 @@ namespace ProductManagement.Controllers
         [HttpPost]
         public IActionResult UpdateQuantity(int productId, int quantity)
         {
+            // Kiểm tra nếu là Admin thì từ chối
+            if (IsAdminUser())
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Tài khoản Admin không thể thực hiện chức năng này" });
+                }
+
+                return RedirectToAction("Index", "Admin");
+            }
+
             if (quantity <= 0)
             {
                 _cartService.RemoveFromCart(productId);
@@ -119,6 +174,17 @@ namespace ProductManagement.Controllers
         [HttpPost]
         public IActionResult ClearCart()
         {
+            // Kiểm tra nếu là Admin thì từ chối
+            if (IsAdminUser())
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Tài khoản Admin không thể thực hiện chức năng này" });
+                }
+
+                return RedirectToAction("Index", "Admin");
+            }
+
             _cartService.ClearCart();
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -131,6 +197,11 @@ namespace ProductManagement.Controllers
 
         public IActionResult Checkout()
         {
+            // Kiểm tra nếu là Admin thì từ chối
+            var checkResult = CheckUserRole();
+            if (checkResult != null)
+                return checkResult;
+
             var cart = _cartService.GetCart();
             if (cart.Items.Count == 0)
             {
@@ -145,6 +216,13 @@ namespace ProductManagement.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Checkout(OrderViewModel model)
         {
+            // Kiểm tra nếu là Admin thì từ chối
+            if (IsAdminUser())
+            {
+                TempData["ErrorMessage"] = "Tài khoản Admin không thể thực hiện chức năng này";
+                return RedirectToAction("Index", "Admin");
+            }
+
             var cart = _cartService.GetCart();
             if (cart.Items.Count == 0)
             {
@@ -169,6 +247,11 @@ namespace ProductManagement.Controllers
 
         public IActionResult OrderSuccess()
         {
+            // Kiểm tra nếu là Admin thì từ chối
+            var checkResult = CheckUserRole();
+            if (checkResult != null)
+                return checkResult;
+
             return View();
         }
     }

@@ -1,3 +1,4 @@
+﻿// Controllers/HomeController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductManagement.Data;
@@ -17,16 +18,31 @@ namespace ProductManagement.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int? categoryId)
+        public async Task<IActionResult> Index(int? categoryId, string searchString)
         {
+            // Chuyển hướng Admin đến trang quản trị
+            if (User.IsInRole("Admin"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+
             var productsQuery = _context.Products
                 .Include(p => p.Category)
                 .AsQueryable();
 
+            // Lọc theo danh mục
             if (categoryId.HasValue)
             {
                 productsQuery = productsQuery.Where(p => p.CategoryId == categoryId.Value);
                 ViewData["SelectedCategoryId"] = categoryId.Value;
+            }
+
+            // Tìm kiếm theo tên hoặc mô tả
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                productsQuery = productsQuery.Where(p => p.Name.Contains(searchString)
+                                                      || p.Description.Contains(searchString));
+                ViewData["SearchString"] = searchString;
             }
 
             var categories = await _context.Categories.ToListAsync();

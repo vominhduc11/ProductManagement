@@ -25,16 +25,22 @@
         <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary">
             <i class="fas fa-info-circle me-1"></i>Chi tiết
         </a>
-        @if (User.Identity.IsAuthenticated)
+        @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
         {
             <button class="btn btn-success add-to-cart" data-product-id="@Model.Id">
                 <i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ
             </button>
         }
-        else
+        else if (!User.Identity.IsAuthenticated)
         {
             <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Products", new { id = Model.Id })" class="btn btn-warning">
                 <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập để mua
+            </a>
+        }
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="fas fa-edit me-1"></i>Sửa
             </a>
         }
     </div>
