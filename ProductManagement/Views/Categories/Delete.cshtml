@@ -1,0 +1,60 @@
+﻿@model ProductManagement.Models.Category
+
+@{
+    ViewData["Title"] = "Xóa danh mục";
+}
+
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Danh mục</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Xóa</li>
+        </ol>
+    </nav>
+
+    <h1 class="section-header text-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>Xóa danh mục
+    </h1>
+
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">
+            <i class="fas fa-exclamation-circle me-2"></i>Cảnh báo!
+        </h4>
+        <p>Bạn có chắc chắn muốn xóa danh mục này?</p>
+        <p>Lưu ý: Nếu danh mục có sản phẩm liên quan, bạn không thể xóa danh mục này.</p>
+    </div>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h4 class="card-title mb-0">@Model.Name</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Name)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Description)</dt>
+                <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả" : Model.Description)</dd>
+
+                <dt class="col-sm-3">Số lượng sản phẩm</dt>
+                <dd class="col-sm-9">@(Model.Products?.Count ?? 0)</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-danger" @((Model.Products?.Count > 0) ? "disabled" : "")>
+                        <i class="fas fa-trash me-1"></i>Xóa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,213 @@
+﻿@model ProductManagement.Models.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Bảng điều khiển Admin";
+}
+
+<div class="container">
+    <h1 class="section-header mb-4">
+        <i class="fas fa-tachometer-alt me-2"></i>Bảng điều khiển Admin
+    </h1>
+
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Tổng sản phẩm</h5>
+                            <h2 class="card-text">@Model.TotalProducts</h2>
+                        </div>
+                        <i class="fas fa-box fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a asp-controller="Products" asp-action="Index" class="text-white">
+                        Xem chi tiết
+                    </a>
+                    <i class="fas fa-arrow-circle-right"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Tổng danh mục</h5>
+                            <h2 class="card-text">@Model.TotalCategories</h2>
+                        </div>
+                        <i class="fas fa-tags fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a asp-controller="Categories" asp-action="Index" class="text-white">
+                        Xem chi tiết
+                    </a>
+                    <i class="fas fa-arrow-circle-right"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Tổng người dùng</h5>
+                            <h2 class="card-text">@Model.TotalUsers</h2>
+                        </div>
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a asp-controller="Admin" asp-action="Users" class="text-white">
+                        Xem chi tiết
+                    </a>
+                    <i class="fas fa-arrow-circle-right"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-box me-2"></i>Sản phẩm mới nhất</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 60px;">Hình ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Danh mục</th>
+                                    <th>Giá</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model.LatestProducts)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(product.ImagePath))
+                                            {
+                                                <img src="@product.ImagePath" class="img-thumbnail" width="50" height="50" alt="@product.Name">
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-image text-muted fa-2x"></i>
+                                            }
+                                        </td>
+                                        <td>@product.Name</td>
+                                        <td>
+                                            <span class="category-badge">@product.Category.Name</span>
+                                        </td>
+                                        <td>@product.Price.ToString("N0") đ</td>
+                                        <td>
+                                            <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-list me-1"></i>Xem tất cả sản phẩm
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Thống kê theo danh mục</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var stat in Model.CategoryStats)
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>@stat.Name</span>
+                                <span>@stat.ProductCount sản phẩm</span>
+                            </div>
+                            <div class="progress">
+                                @{
+                                    var percentage = Model.TotalProducts > 0
+                                    ? (int)((double)stat.ProductCount / Model.TotalProducts * 100)
+                                    : 0;
+                                    var colorClass = "bg-info";
+                                    if (percentage > 75) colorClass = "bg-success";
+                                    else if (percentage > 50) colorClass = "bg-primary";
+                                    else if (percentage > 25) colorClass = "bg-warning";
+                                }
+                                <div class="progress-bar @colorClass" role="progressbar" style="width: @percentage%" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100">@percentage%</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Categories" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-tags me-1"></i>Quản lý danh mục
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Các tác vụ quản trị</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Products" asp-action="Create" class="card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Thêm sản phẩm</h5>
+                                    <p class="card-text text-muted">Thêm sản phẩm mới vào hệ thống</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Categories" asp-action="Create" class="card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-folder-plus fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title">Thêm danh mục</h5>
+                                    <p class="card-text text-muted">Tạo danh mục mới</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Admin" asp-action="Users" class="card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-cog fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title">Quản lý người dùng</h5>
+                                    <p class="card-text text-muted">Phân quyền và quản lý tài khoản</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-controller="Diagnostics" asp-action="TestDatabase" class="card h-100 text-decoration-none">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-database fa-3x text-secondary mb-3"></i>
+                                    <h5 class="card-title">Kiểm tra cơ sở dữ liệu</h5>
+                                    <p class="card-text text-muted">Kiểm tra kết nối và quyền</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

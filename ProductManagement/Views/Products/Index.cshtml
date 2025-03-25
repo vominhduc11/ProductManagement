@@ -1,0 +1,92 @@
+﻿@model IEnumerable<ProductManagement.Models.Product>
+
+@{
+    ViewData["Title"] = "Sản phẩm";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="section-header">
+            <i class="fas fa-box me-2"></i>Danh sách sản phẩm
+        </h1>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-success">
+                <i class="fas fa-plus-circle me-1"></i>Thêm sản phẩm mới
+            </a>
+        }
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Hình ảnh</th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Category)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Price)
+                            </th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td style="width: 80px;">
+                                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                                    {
+                                        <img src="@item.ImagePath" style="width: 60px; height: 60px; object-fit: cover;" class="rounded" alt="@item.Name">
+                                    }
+                                    else
+                                    {
+                                        <div class="text-center bg-light rounded p-2" style="width: 60px; height: 60px;">
+                                            <i class="fas fa-image text-muted"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    <span class="category-badge">
+                                        @Html.DisplayFor(modelItem => item.Category.Name)
+                                    </span>
+                                </td>
+                                <td>
+                                    @item.Price.ToString("N0") đ
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        }
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">
+                                            <i class="fas fa-info-circle"></i>
+                                        </a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

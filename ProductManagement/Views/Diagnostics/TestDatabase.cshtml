@@ -1,0 +1,155 @@
+﻿@model ProductManagement.Controllers.DatabaseTestViewModel
+
+@{
+    ViewData["Title"] = "Kiểm tra kết nối cơ sở dữ liệu";
+}
+
+<div class="container">
+    <h1 class="section-header">
+        <i class="fas fa-database me-2"></i>Kiểm tra kết nối cơ sở dữ liệu
+    </h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Thông tin cơ sở dữ liệu
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-muted">Chuỗi kết nối:</div>
+                <div class="col-md-9">@Model.ConnectionString</div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-3 text-muted">Nhà cung cấp:</div>
+                <div class="col-md-9">@Model.DatabaseProvider</div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-3 text-muted">Phiên bản:</div>
+                <div class="col-md-9">@Model.ServerVersion</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plug me-2"></i>Trạng thái kết nối
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center">
+                        @if (Model.CanConnect)
+                        {
+                            <div class="text-success mb-3">
+                                <i class="fas fa-check-circle fa-5x"></i>
+                            </div>
+                            <h4 class="text-success">Kết nối thành công</h4>
+                        }
+                        else
+                        {
+                            <div class="text-danger mb-3">
+                                <i class="fas fa-times-circle fa-5x"></i>
+                            </div>
+                            <h4 class="text-danger">Không thể kết nối</h4>
+
+                            @if (!string.IsNullOrEmpty(Model.Error))
+                            {
+                                <div class="alert alert-danger mt-3">
+                                    <p><strong>Lỗi:</strong> @Model.Error</p>
+                                    @if (!string.IsNullOrEmpty(Model.InnerError))
+                                    {
+                                        <p><strong>Chi tiết:</strong> @Model.InnerError</p>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-wrench me-2"></i>Kiểm tra quyền
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.CanConnect)
+                    {
+                        <div class="d-flex flex-column align-items-center">
+                            @if (Model.CanWrite)
+                            {
+                                <div class="text-success mb-3">
+                                    <i class="fas fa-pen-alt fa-5x"></i>
+                                </div>
+                                <h4 class="text-success">Có quyền ghi dữ liệu</h4>
+                            }
+                            else
+                            {
+                                <div class="text-warning mb-3">
+                                    <i class="fas fa-exclamation-triangle fa-5x"></i>
+                                </div>
+                                <h4 class="text-warning">Không có quyền ghi dữ liệu</h4>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary text-center">
+                            <p>Vui lòng kiểm tra kết nối trước khi kiểm tra quyền</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.CanConnect)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-table me-2"></i>Thống kê dữ liệu
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="py-3">
+                            <h2 class="display-4">@Model.CategoryCount</h2>
+                            <p class="text-muted">Danh mục</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="py-3">
+                            <h2 class="display-4">@Model.ProductCount</h2>
+                            <p class="text-muted">Sản phẩm</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="py-3">
+                            <h2 class="display-4">@Model.UserCount</h2>
+                            <p class="text-muted">Người dùng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between mb-4">
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Quay lại bảng điều khiển
+        </a>
+        <a asp-action="TestDatabase" class="btn btn-primary">
+            <i class="fas fa-sync me-1"></i>Kiểm tra lại
+        </a>
+    </div>
+</div>

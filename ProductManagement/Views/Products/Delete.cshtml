@@ -1,0 +1,72 @@
+﻿@model ProductManagement.Models.Product
+
+@{
+    ViewData["Title"] = "Xóa sản phẩm";
+}
+
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Xóa</li>
+        </ol>
+    </nav>
+
+    <h1 class="section-header text-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>Xóa sản phẩm
+    </h1>
+
+    <div class="alert alert-danger">
+        <h4 class="alert-heading">
+            <i class="fas fa-exclamation-circle me-2"></i>Cảnh báo!
+        </h4>
+        <p>Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.</p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    @if (!string.IsNullOrEmpty(Model.ImagePath))
+                    {
+                        <img src="@Model.ImagePath" alt="@Model.Name" class="img-fluid rounded" style="max-height: 300px; width: 100%; object-fit: contain;" />
+                    }
+                    else
+                    {
+                        <div class="text-center bg-light p-5 rounded">
+                            <i class="fas fa-image fa-5x text-muted"></i>
+                            <p class="mt-3 text-muted">Không có hình ảnh</p>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <h2 class="mb-3">@Model.Name</h2>
+
+                    <div class="mb-4">
+                        <span class="category-badge">@Model.Category.Name</span>
+                    </div>
+
+                    <h3 class="price mb-4">@Model.Price.ToString("N0") đ</h3>
+
+                    <div class="mb-4">
+                        <h5 class="text-muted">Mô tả sản phẩm</h5>
+                        <p>@(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả" : Model.Description)</p>
+                    </div>
+
+                    <form asp-action="Delete" onsubmit="return confirmDelete(event, 'Bạn có chắc chắn muốn xóa sản phẩm này?')">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex gap-2">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Xác nhận xóa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

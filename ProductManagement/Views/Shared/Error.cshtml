@@ -1,0 +1,25 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Lỗi";
+}
+
+<div class="text-center mt-5">
+    <h1 class="text-danger">
+        <i class="fas fa-exclamation-circle"></i>
+        Đã xảy ra lỗi
+    </h1>
+    <h2 class="text-danger">Đã xảy ra lỗi trong khi xử lý yêu cầu của bạn.</h2>
+
+    @if (Model.ShowRequestId)
+    {
+        <p>
+            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+        </p>
+    }
+
+    <div class="mt-4">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+            <i class="fas fa-home me-1"></i>Về trang chủ
+        </a>
+    </div>
+</div>

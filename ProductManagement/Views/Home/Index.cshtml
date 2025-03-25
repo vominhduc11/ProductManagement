@@ -1,0 +1,93 @@
+﻿@model IEnumerable<ProductManagement.Models.Product>
+@{
+    ViewData["Title"] = "Trang chủ";
+    var categories = ViewData["Categories"] as IEnumerable<ProductManagement.Models.Category>;
+    int? selectedCategoryId = ViewData["SelectedCategoryId"] as int?;
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="section-header">
+                <i class="fas fa-store me-2"></i>Danh sách sản phẩm
+            </h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-1"></i>
+                    @if (selectedCategoryId.HasValue)
+                    {
+                        var category = categories.FirstOrDefault(c => c.Id == selectedCategoryId.Value);
+                        @(category?.Name ?? "Tất cả danh mục")
+                    }
+                    else
+                    {
+                        <span>Tất cả danh mục</span>
+                    }
+                </button>
+                <ul class="dropdown-menu custom-dropdown" aria-labelledby="categoryDropdown">
+                    <li>
+                        <a class="dropdown-item @(selectedCategoryId == null ? "active" : "")" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-th-list me-1"></i>Tất cả danh mục
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    @foreach (var category in categories)
+                    {
+                        <li>
+                            <a class="dropdown-item @(selectedCategoryId == category.Id ? "active" : "")"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-route-categoryId="@category.Id">
+                                <i class="fas fa-tag me-1"></i>@category.Name
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>Không có sản phẩm nào trong danh mục này
+        </div>
+    }
+    else
+    {
+        <div class="product-grid">
+            @foreach (var product in Model)
+            {
+                <div class="card h-100">
+                    @if (!string.IsNullOrEmpty(product.ImagePath))
+                    {
+                        <img src="@product.ImagePath" class="card-img-top" alt="@product.Name">
+                    }
+                    else
+                    {
+                        <div class="text-center bg-light p-4">
+                            <i class="fas fa-image fa-5x text-muted"></i>
+                        </div>
+                    }
+                    <div class="card-body">
+                        <span class="category-badge float-end">@product.Category.Name</span>
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">
+                            @(product.Description?.Length > 100
+                                ? $"{product.Description.Substring(0, 100)}..."
+                                : product.Description ?? "Không có mô tả")
+                        </p>
+                        <p class="price">@product.Price.ToString("N0") đ</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-info-circle me-1"></i>Chi tiết
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
