@@ -35,12 +35,43 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">
+                                    <i class="fas fa-tags me-1"></i>Danh mục
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">
                                     <i class="fas fa-tachometer-alt me-1"></i>Bảng điều khiển
                                 </a>
                             </li>
                         }
                     </ul>
+
+                    <form class="d-flex me-2" asp-controller="Home" asp-action="Index" method="get">
+                        <div class="input-group">
+                            <input class="form-control" type="search" name="searchString" value="@ViewData["SearchString"]" placeholder="Tìm sản phẩm..." aria-label="Tìm kiếm">
+                            <button class="btn btn-outline-light" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    @inject ProductManagement.Services.CartService CartService
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        var cart = CartService.GetCart();
+
+                        <div class="me-2">
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-light position-relative">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+                                    @cart.TotalItems
+                                </span>
+                            </a>
+                        </div>
+                    }
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
@@ -48,6 +79,22 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
             @RenderBody()
         </main>
     </div>
@@ -57,6 +104,8 @@
             &copy; 2025 - Ứng dụng Quản lý sản phẩm - <a asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách</a>
         </div>
     </footer>
+
+    <!-- Toast container -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
